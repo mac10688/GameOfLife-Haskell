@@ -4,4 +4,4 @@ import World
 import Cell
 
 createDeadWorld :: World
-createDeadWorld = [[Dead | y <- [0..9]] | x <- [0..9]]
+createDeadWorld = [[Dead | _ <- [0..9]] | _ <- [0..9]]
