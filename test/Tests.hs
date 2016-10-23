@@ -5,6 +5,7 @@ import Test.Hspec
 import Cell
 import World
 import Game
+import Position
 
 createNeighbors :: Int -> [Cell]
 createNeighbors liveCells = (replicate liveCells Live) ++ (replicate (8 - liveCells) Dead)
@@ -13,10 +14,10 @@ main :: IO ()
 main = hspec $ do
   describe "buildWorld" $ do
     it "places live cells: top left" $ do
-      let world = buildWorld 3 3 [(0,0)]
+      let world = buildWorld 3 3 [mkPosition 0 0 ]
       [[Live,Dead,Dead],[Dead,Dead,Dead],[Dead,Dead,Dead]] == getWorld world
     it "places live cells: bottom right" $ do
-      let world = buildWorld 3 3 [(2,2)]
+      let world = buildWorld 3 3 [mkPosition 2 2]
       [[Dead,Dead,Dead],[Dead,Dead,Dead],[Dead,Dead,Live]] == getWorld world
     it "can make rectangular worlds" $ do
       let world = buildWorld 1 3 []
@@ -24,10 +25,10 @@ main = hspec $ do
   describe "getNeighbors" $ do
     it "returns 8 cells" $ do
       let world = buildWorld 1 1 []
-      8 == length (getNeighbors world (0,0))
+      8 == (length $ getNeighbors world $ mkPosition 0 0)
     it "provides status of surrounding cells" $ do
-      let world = buildWorld 3 3 [(0,0)]
-      let neighbors = getNeighbors world (1,1)
+      let world = buildWorld 3 3 [mkPosition 0 0]
+      let neighbors = getNeighbors world $ mkPosition 1 1
       let liveCells = filter isLive neighbors
       let deadCells = filter (not . isLive) neighbors
       (length liveCells == 1) && (length deadCells == 7)
