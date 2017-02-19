@@ -63,3 +63,28 @@ main = hspec $ do
     it "rule 4: dead cells repopulate with exactly 3 neighbors" $ do
       let neighbors = createNeighbors 3
       Live == newState Dead neighbors
+  describe "iterateWorld" $ do
+    it "still life: block" $ do
+      let initialState = buildWorld 4 4 [(1,1), (1,2), (2,1),(2,2)]
+          nextState = iterateWorld initialState
+      initialState == nextState
+    it "still life: beehive" $ do
+      let initialState = buildWorld 6 6 [(2,1),(3,1),(1,2),(4,2),(2,3),(3,3)]
+          nextState = iterateWorld initialState
+      initialState == nextState
+    it "oscillator: blinker" $ do
+      let initialState = buildWorld 5 5 [(2,2), (1,2), (3,2)]
+          nextState = iterateWorld initialState
+          expectedState = buildWorld 5 5 [(2,2), (2,1), (2,3)]
+      nextState == expectedState
+    it "oscillator: blinker repeats" $ do
+      let initialState = buildWorld 5 5 [(2,2), (1,2), (3,2)]
+      initialState == (iterateWorld $ iterateWorld initialState)
+    it "oscillator: toad" $ do
+      let initialState = buildWorld 6 6 [(1,2),(1,3),(2,4),(3,1),(4,2),(4,3)]
+          nextState = iterateWorld initialState
+          expectedState = buildWorld 6 6 [(1,3),(2,3),(3,3),(2,2),(3,2),(4,2)]
+      nextState == expectedState
+    it "oscillator: toad repeats" $ do
+      let initialState = buildWorld 6 6 [(1,2),(1,3),(2,4),(3,1),(4,2),(4,3)]
+      initialState == (iterateWorld $ iterateWorld initialState)
