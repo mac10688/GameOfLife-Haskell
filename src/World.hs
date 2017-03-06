@@ -1,14 +1,8 @@
-<<<<<<< HEAD
-module World (World, getWorld, buildWorld, getNeighbors, lookupCell) where
+module World (World, getWorld, buildWorld, getNeighbors, lookupCell, iterateWorld) where
 
 import Cell
 import Position
-=======
-module World (World, getWorld, deadWorld, buildWorld, getNeighbors, lookupCell, iterateWorld) where
-
-import Cell
 import Game
->>>>>>> iterateWorld
 
 newtype World = W {getWorld :: [[Cell]]}
 
@@ -26,7 +20,7 @@ buildWorld col row liveCells = W [
 iterateWorld :: World -> World
 iterateWorld world =
   let w = (flip fmap) (getWorld world `zip` [(0 :: Int)..]) (\x -> fmap (zipWith (\y -> \z -> ((snd x,y), z)) [(0 :: Int)..]) fst x)
-  in W (fmap (fmap (\x -> newState (snd x) (getNeighbors world ((uncurry mkPosition) fst x)))) w)
+  in W (fmap (fmap (\x -> newState (snd x) (getNeighbors world ((uncurry mkPosition) $ fst x)))) w)
 
 getNeighbors :: World -> Position -> [Cell]
 getNeighbors world position = let
