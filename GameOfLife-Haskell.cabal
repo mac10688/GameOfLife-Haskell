@@ -14,7 +14,8 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs: src
-  exposed-modules: Game
+  exposed-modules:
+                   Game
                   ,Cell
                   ,World
   build-depends:
@@ -27,6 +28,8 @@ executable GameOfLife-Haskell
   default-language:    Haskell2010
   build-depends:       base >= 4.7 && < 5
                       ,GameOfLife-Haskell
+                      ,reactive-banana
+                      ,ansi-terminal
 
 Test-Suite tests
   ghc-options:      -Wall
