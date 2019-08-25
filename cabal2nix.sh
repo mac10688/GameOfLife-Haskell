@@ -1,1 +1,1 @@
-cabal2nix . > projext.nix
+cabal2nix . > project.nix

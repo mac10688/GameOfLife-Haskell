@@ -1,4 +1,5 @@
-{ mkDerivation, ansi-terminal, base, hspec, reactive-banana, stdenv
+{ mkDerivation, ansi-terminal, base, hspec, ncurses
+, reactive-banana, stdenv
 }:
 mkDerivation {
   pname = "GameOfLife-Haskell";
@@ -7,7 +8,9 @@ mkDerivation {
   isLibrary = true;
   isExecutable = true;
   libraryHaskellDepends = [ base ];
-  executableHaskellDepends = [ ansi-terminal base reactive-banana ];
+  executableHaskellDepends = [
+    ansi-terminal base ncurses reactive-banana
+  ];
   testHaskellDepends = [ base hspec ];
   homepage = "https://github.com/githubuser/GameOfLife-Haskell#readme";
   description = "Simple project template from stack";

@@ -30,6 +30,7 @@ executable GameOfLife-Haskell
                       ,GameOfLife-Haskell
                       ,reactive-banana
                       ,ansi-terminal
+                      ,ncurses
 
 Test-Suite tests
   ghc-options:      -Wall
