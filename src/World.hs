@@ -1,45 +1,82 @@
-module World (World, getWorld, buildWorld, getNeighbors, lookupCell, iterateWorld) where
+module World (World, buildWorld, iterateWorld, Position(..), getWorld, toList, Cell(..), getNeighbors, isLive, newState) where
 
-import Cell
-import Position
-import Game
+import Prelude hiding (lookup)
 
-newtype World = W {getWorld :: [[Cell]]}
+import Data.Map.Strict as Map (fromList, Map, lookup, mapWithKey, toAscList)
+import Data.Maybe (catMaybes)
+--import Data.List (groupBy, intercalate)
 
-instance Show World where
-  show (W cells) = cells >>= (\row -> show row ++ "\n")
-instance Eq World where
-  a == b = (getWorld a) == (getWorld b)
+data Position = Position { row :: Integer
+                         , col :: Integer
+                         } deriving (Show, Eq, Ord)
 
-buildWorld :: Int -> Int -> [Position] -> World
-buildWorld col row liveCells = W [
-  [ if mkPosition r c `elem` liveCells then Live else Dead
-    | r <- [0..(row-1)]]
-    | c <- [0..(col-1)]]
+newtype World = W {getWorld :: Map Position Cell}
+  deriving (Eq, Show)
+
+--instance Show World where
+  --show (W worldMap) =  unwords $ intercalate ["\n"] $ showCell $ groupByRow $ toAscList worldMap
+    --where
+      --groupByRow :: [(Position, Cell)] -> [[(Position, Cell)]]
+      --groupByRow worldArray = groupBy (\ (pos1, _) (pos2, _) -> (row pos1) == (row pos2)) worldArray
+      --showCell :: [[(Position, Cell)]] -> [[String]]
+      --showCell = (map . map) (show . snd)
+
+toList :: World -> [(Position, Cell)]
+toList world = toAscList $ getWorld world
+
+buildWorld :: Integer -> Integer -> [Position] -> World
+buildWorld row' col' liveCells = let
+  cells = [ if (Position r c) `elem` liveCells then (Position r c, Live) else (Position r c, Dead) 
+    | c <- [ 1..col' ], r <- [ 1..row' ]]
+  in
+    W $ fromList cells
 
 iterateWorld :: World -> World
 iterateWorld world =
-  let w = (flip fmap) (getWorld world `zip` [(0 :: Int)..]) (\x -> fmap (zipWith (\y -> \z -> ((snd x,y), z)) [(0 :: Int)..]) fst x)
-  in W (fmap (fmap (\x -> newState (snd x) (getNeighbors world ((uncurry mkPosition) $ fst x)))) w)
+  let
+    worldMap = getWorld world
+  in
+    W $ mapWithKey (iterateCell worldMap) worldMap
 
-getNeighbors :: World -> Position -> [Cell]
-getNeighbors world position = let
-  (row, col) = getPosition position
+iterateCell :: Map Position Cell -> Position -> Cell -> Cell
+iterateCell worldMap position cell = 
+  let 
+    neighbors = getNeighbors worldMap position 
+  in
+    newState cell neighbors
+
+getNeighbors :: Map Position Cell -> Position -> [Cell]
+getNeighbors worldMap position = let
   neighborPositions = [
-                         mkPosition (row + 1) (col + 1)
-                        ,mkPosition (row + 1) col
-                        ,mkPosition (row + 1) (col - 1)
-                        ,mkPosition row (col + 1)
-                        ,mkPosition row (col - 1)
-                        ,mkPosition (row - 1) (col + 1)
-                        ,mkPosition (row - 1) col
-                        ,mkPosition (row - 1) (col - 1)
+                         lookup (Position (row position + 1) (col position + 1)) worldMap
+                        ,lookup (Position (row position + 1) (col position)) worldMap
+                        ,lookup (Position (row position + 1) (col position - 1)) worldMap
+                        ,lookup (Position (row position) (col position + 1)) worldMap
+                        ,lookup (Position (row position) (col position - 1)) worldMap
+                        ,lookup (Position (row position - 1) (col position + 1)) worldMap
+                        ,lookup (Position (row position - 1) (col position)) worldMap
+                        ,lookup (Position (row position - 1) (col position - 1)) worldMap 
                       ]
-  in map (lookupCell world) neighborPositions
+  in catMaybes neighborPositions
 
-lookupCell :: World -> Position -> Cell
-lookupCell (W cells) position = let
-  (row, col) = getPosition position
-  colMax = length $ cells !! 0
-  rowMax = length cells
-  in cells !! (row `mod` rowMax) !! (col `mod` colMax)
+data Cell = Live | Dead
+    deriving (Eq)
+
+instance Show Cell where
+  show Live = "O"
+  show Dead = "X"
+
+isLive :: Cell -> Bool
+isLive Live = True
+isLive _    = False
+
+newState :: Cell -> [Cell] -> Cell
+newState Live neighbors = let
+  liveCells = length (filter isLive neighbors)
+  in if (liveCells == 2 || liveCells == 3)
+    then Live
+    else Dead
+newState Dead neighbors =
+  if (3 == length (filter isLive neighbors))
+    then Live
+    else Dead
