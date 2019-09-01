@@ -37,18 +37,14 @@ iterateCell worldMap position cell =
     newState cell neighbors
 
 getNeighbors :: Map Position Cell -> Position -> [Cell]
-getNeighbors worldMap position = let
-  neighborPositions = [
-                         lookup (Position (row position + 1) (col position + 1)) worldMap
-                        ,lookup (Position (row position + 1) (col position)) worldMap
-                        ,lookup (Position (row position + 1) (col position - 1)) worldMap
-                        ,lookup (Position (row position) (col position + 1)) worldMap
-                        ,lookup (Position (row position) (col position - 1)) worldMap
-                        ,lookup (Position (row position - 1) (col position + 1)) worldMap
-                        ,lookup (Position (row position - 1) (col position)) worldMap
-                        ,lookup (Position (row position - 1) (col position - 1)) worldMap 
-                      ]
-  in catMaybes neighborPositions
+getNeighbors worldMap position = 
+  let
+    neighborPositions = [ lookup (Position r c) worldMap 
+      | c <- [(col position -1) .. (col position + 1)]
+      , r <- [(row position -1) .. (row position + 1)]
+      , not (c == (col position) && r == (row position)) ]
+  in 
+    catMaybes neighborPositions
 
 data Cell = Live | Dead
     deriving (Eq)
