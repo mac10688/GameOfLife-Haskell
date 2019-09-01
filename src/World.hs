@@ -47,11 +47,7 @@ getNeighbors worldMap position =
     catMaybes neighborPositions
 
 data Cell = Live | Dead
-    deriving (Eq)
-
-instance Show Cell where
-  show Live = "O"
-  show Dead = "X"
+    deriving (Eq, Show)
 
 isLive :: Cell -> Bool
 isLive Live = True
