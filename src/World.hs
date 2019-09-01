@@ -4,7 +4,6 @@ import Prelude hiding (lookup)
 
 import Data.Map.Strict as Map (fromList, Map, lookup, mapWithKey, toAscList)
 import Data.Maybe (catMaybes)
---import Data.List (groupBy, intercalate)
 
 data Position = Position { row :: Integer
                          , col :: Integer
@@ -12,14 +11,6 @@ data Position = Position { row :: Integer
 
 newtype World = W {getWorld :: Map Position Cell}
   deriving (Eq, Show)
-
---instance Show World where
-  --show (W worldMap) =  unwords $ intercalate ["\n"] $ showCell $ groupByRow $ toAscList worldMap
-    --where
-      --groupByRow :: [(Position, Cell)] -> [[(Position, Cell)]]
-      --groupByRow worldArray = groupBy (\ (pos1, _) (pos2, _) -> (row pos1) == (row pos2)) worldArray
-      --showCell :: [[(Position, Cell)]] -> [[String]]
-      --showCell = (map . map) (show . snd)
 
 toList :: World -> [(Position, Cell)]
 toList world = toAscList $ getWorld world
